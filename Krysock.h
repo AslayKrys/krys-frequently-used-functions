@@ -84,6 +84,8 @@ int world_saved ();
 
 void fd_obtain (int fd);
 
+int send_fd (int sock, int fd_sent);
+
 int recv_fd (const int sock_fd);
 #ifdef __cplusplus
 }

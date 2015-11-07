@@ -20,14 +20,11 @@ CC = 	clang
 OBJS = 	$(shell ls *.c *.cpp 2>/dev/null | sed "s/\(.*\.\)\(c\|cpp\)/\1o/")
 LINK = $(shell ls *.cpp &>/dev/null  && echo $(CXX) || echo $(CC))
 
-all:header_check bin_check $(BIN)
+all:header_check $(BIN)
 
 header_check:
-	ls -rt *.h *.o 2>/dev/null | tail -1 | grep "\.h$$" &>/dev/null && touch $$(ls *.cpp *.c 2> /dev/null) \
-		|| [ 0 ]
-bin_check:
-	ls -rt * 2>/dev/null | grep -v Makefile | tail -1 | grep '\.c\|\.cpp\|\.o' &>/dev/null || echo "Everthing is done ^_^." \
-		|| [ 0 ]
+	ls -rt *.h *.o 2>/dev/null | tail -1 | grep "\.h$$" &>/dev/null && touch $$(ls *.cpp *.c 2> /dev/null)
+		
 
 
 all:$(DYNAMIC_LIB)

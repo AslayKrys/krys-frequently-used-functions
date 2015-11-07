@@ -1,0 +1,102 @@
+#ifndef KRYSOCKET_H
+#define KRYSOCKET_H
+#include "Krys.h"
+#include <stdio.h>
+#include <sys/select.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/select.h>
+#include <sys/wait.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <sys/types.h>
+#include <stdlib.h>
+#include <errno.h> 
+#include <string.h>
+#include <arpa/inet.h>
+#include <strings.h>
+#include <signal.h>
+#include <netdb.h>
+#include <string>
+#include <sys/un.h>
+
+
+
+/*--------------------------------------------type define------------------------------------------*/
+typedef struct client_info
+{
+	int client_fd;
+	char client_address[16];
+	unsigned short client_port;
+}client_info;
+/*----------------------------------------------END------------------------------------------------*/
+
+
+
+
+
+#define TCP_ACCEPT(socket_fd,sockaddr_ptr) \
+	({socklen_t peerlen = sizeof (struct sockaddr_in); accept (socket_fd, (struct sockaddr*)sockaddr_ptr, sockaddr_ptr == NULL ? NULL : &peerlen);})
+
+
+#define CONN_ERRLOG(m) \
+	ERRLOG(m)
+
+#define READ_TIMEOUT 5
+#define BUFFSIZE 1024
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+int udp_bind (const char* ip, unsigned short port);
+
+int tcp_listen (const char* host, unsigned short port);
+
+client_info* tcp_accept (int socket);
+
+char* socket_ip (int socket_);
+
+unsigned short socket_port (int socket_);
+
+int tcp_open (const char* host, unsigned short port);
+
+int tcp_read (int socket, void* buf, int len);
+
+int tcp_write (int socket, const void* buf, int len);
+
+int recv_peek (int socket, void* buf, size_t len);
+
+ssize_t tcp_readline (int socket, void* buf, int max_len);
+
+int tcp_read_timeout (int socket_, void* buf, int len, int second);
+
+int read_timeout (int socket, unsigned int sec);
+
+int analysis_addr (const char *_addrstr, u_int32_t *_addr);
+
+int krys_read (int socket_, void** buf);
+
+int krys_write (int socket_, const void* buf, int len);
+
+
+int world_saved ();
+
+void fd_obtain (int fd);
+
+int recv_fd (const int sock_fd);
+#ifdef __cplusplus
+}
+#endif
+#ifdef __cplusplus
+int java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out);
+
+int java_write (int socket_, const void* buf, unsigned short len);
+
+std::string string_receive (int socket_, int timeout);
+
+bool string_send (int socket_, const std::string& str);
+
+#endif
+
+#endif /*KRYSOCKET_H*/

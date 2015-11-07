@@ -19,6 +19,23 @@ void krys3des_encryption (const std::string & source, const char* key24bytes, st
 void krys3des_decryption (const std::string & input, const char* key24bytes, std::string & output);
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*----------------------------------function definitions-------------------------------------------*/
+
+
+int krys3des_raw_encryption (const void* src, int input_length, void* key24bytes, void* out_buffer);
+int krys3des_raw_decryption (const void* src, unsigned int input_length, void* key24bytes, void*out_buffer);
+
+/*----------------------------------------------END------------------------------------------------*/
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 void base64_encode(unsigned char const* bytes_to_encode, unsigned int in_len, std::string & ret);

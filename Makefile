@@ -23,32 +23,23 @@ LINK = $(shell ls *.cpp &>/dev/null  && echo $(CXX) || echo $(CC))
 all:header_check bin_check $(BIN)
 
 header_check:
-	@ls -rt *.h *.o 2>/dev/null | tail -1 | grep "\.h$$" &>/dev/null && touch $$(ls *.cpp *.c 2> /dev/null) \
+	ls -rt *.h *.o 2>/dev/null | tail -1 | grep "\.h$$" &>/dev/null && touch $$(ls *.cpp *.c 2> /dev/null) \
 		|| [ 0 ]
 bin_check:
-	@  ls -rt * 2>/dev/null | grep -v Makefile | tail -1 | grep '\.c\|\.cpp\|\.o' &>/dev/null || echo "Everthing is done ^_^." \
+	ls -rt * 2>/dev/null | grep -v Makefile | tail -1 | grep '\.c\|\.cpp\|\.o' &>/dev/null || echo "Everthing is done ^_^." \
 		|| [ 0 ]
 
 
 all:$(DYNAMIC_LIB)
 
 $(DYNAMIC_LIB):$(OBJS)
-	@echo -e "\n----------COMPILING DONE, LINKING-------------------"
-	@echo $^ | awk '{for (i=1;i<=NF;i++) print $$i}'
-	@echo " |"
-	@echo " |"
-	@echo " V"
-	@echo "$@"
-	@$(LINK) -fPIC -shared $^ -o $@ 
-	@echo "---------------DONE!!!!-----------------------------"
+	$(LINK) -fPIC -shared $^ -o $@ 
 
 %.o:%.cpp 
-	@printf  "COMPILING: %-15s ---> %-15s|\n" $^ $@
-	@$(CXX) $< $(CXXFLAGS)  -c -o $@
+	$(CXX) $< $(CXXFLAGS)  -c -o $@
 
 %.o:%.c 
-	@printf  "COMPILING: %-15s ---> %-15s|\n" $^ $@
-	@$(CC) $< $(CFLAGS) -c -o $@
+	$(CC) $< $(CFLAGS) -c -o $@
 
 clean:
-	rm -f  $(DYNAMIC_LIB) *.o
+	$(RM)  $(DYNAMIC_LIB) *.o

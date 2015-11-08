@@ -327,3 +327,18 @@ void percent_code (const char* input, int len, std::string output)
 		output[i + 2] += input[i] < 10 ? '0' : '7';
 	}
 }
+
+int gbk_len (const std::string& gbk)
+{
+	int len = 0;
+	for (unsigned int i = 0; i < gbk.length(); i++)
+	{
+		len ++;
+		if ((unsigned char)gbk[i] > 0x80)
+		{
+			i++;
+		}
+	}
+
+	return len;
+}

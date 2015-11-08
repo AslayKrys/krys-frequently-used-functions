@@ -40,8 +40,6 @@ typedef struct client_info
 	({socklen_t peerlen = sizeof (struct sockaddr_in); accept (socket_fd, (struct sockaddr*)sockaddr_ptr, sockaddr_ptr == NULL ? NULL : &peerlen);})
 
 
-#define CONN_ERRLOG(m) \
-	ERRLOG(m)
 
 #define READ_TIMEOUT 5
 #define BUFFSIZE 1024
@@ -82,11 +80,12 @@ int krys_write (int socket_, const void* buf, int len);
 
 int world_saved ();
 
-void fd_obtain (int fd);
-
 int send_fd (int sock, int fd_sent);
 
 int recv_fd (const int sock_fd);
+
+int fd_obtain (int fd, const char* socket_file);
+
 #ifdef __cplusplus
 }
 #endif

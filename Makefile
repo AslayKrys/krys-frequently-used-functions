@@ -23,7 +23,8 @@ LINK = $(shell ls *.cpp &>/dev/null  && echo $(CXX) || echo $(CC))
 all:header_check $(BIN)
 
 header_check:
-	ls -rt *.h *.o 2>/dev/null | tail -1 | grep "\.h$$" &>/dev/null && touch $$(ls *.cpp *.c 2> /dev/null)
+	ls -rt *.h *.o 2>/dev/null | tail -1 | grep "\.h$$" &>/dev/null && touch $$(ls *.cpp *.c 2> /dev/null) \
+		|| echo "header clean"
 		
 
 

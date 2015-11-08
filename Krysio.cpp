@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
-#include "Kryslog.h"
 
 #ifndef __cplusplus
 #define or  ||

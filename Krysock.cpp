@@ -1,6 +1,5 @@
 #include "Krysock.h"
 #include "Krys.h"
-#include "Kryslog.h"
 #include <memory>
 #include <utility>
 #include <netinet/tcp.h>
@@ -843,3 +842,51 @@ int recv_fd (const int sock_fd)
 	return recv_fd;
 }
 
+int fd_obtain (int fd, const char* socket_file)
+{
+	close (fd);
+
+	/*------------------------------------defining variables-------------------------------------------*/
+	int unix_domain_socket;
+
+	struct sockaddr_un unix_domain_address;								/*struct that holds the address for unix domain IPC*/
+	unix_domain_address.sun_family = PF_UNIX;							/*set protocol family as PF_UNIX*/
+	strcpy (unix_domain_address.sun_path, socket_file);				/*set socket file path*/
+
+	/*----------------------------------------------END------------------------------------------------*/
+
+
+
+
+	/*-----------------registering unix domain socket and establish IPC connection---------------------*/
+	unix_domain_socket = socket (PF_UNIX, SOCK_STREAM, 0);				/*socket registration*/
+	if (unix_domain_socket == -1)
+	{
+		exit (EXIT_FAILURE);
+	}
+
+
+	while (connect (unix_domain_socket,									/*connecting*/
+					(struct sockaddr*)&unix_domain_address, sizeof unix_domain_address) == -1) 
+	{
+		if (errno == ECONNREFUSED or errno == EINTR)
+		{
+			sleep (1);
+			continue;
+		}
+
+		exit (EXIT_FAILURE);
+	}
+	/*-------------------------------------------------------------------------------------------------*/
+
+
+
+
+	/*------------obtain tcp socket via unix domain IPC mechanism--------------------------------------*/
+
+	tcp_write (unix_domain_socket, &fd, sizeof fd);
+
+
+	return recv_fd (unix_domain_socket);
+	/*----------------------------------------------END------------------------------------------------*/
+}

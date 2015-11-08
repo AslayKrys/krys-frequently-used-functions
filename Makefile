@@ -6,7 +6,7 @@
 CSTD = 			-std=c99
 CXXSTD = 		-std=c++14    				#   C++ standard
 LIBRARIES = 	-lpthread -lxml2			# linking libraries
-DEFINES = 		-D SYSLOG_ON -D POS_ON -D ERRLOG_ON -D DBGLOG_ON -D SOCKETLOG_ON -D _DEFAULT_SOURCE
+DEFINES = 		
 HEADERDIR = 	-I /usr/include/libxml2  #-I=../headers
 DBGFLAG = 		-g3
 WARNLVL = 		-Wall

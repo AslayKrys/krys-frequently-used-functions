@@ -312,3 +312,18 @@ void krys3des_encryption (const std::string & source, const char* key24bytes, st
 	/*----------------------------------------------END------------------------------------------------*/
 
 }
+
+void percent_code (const char* input, int len, std::string output)
+{
+	output.resize (len * 3);
+
+	for (int i = 0; i < len * 3; i += 3)
+	{
+		output[i] = '%';
+		output [i + 1] = input[i] / 16;
+		output [i + 2] = input[i] % 16;
+
+		output[i + 1] += input[i] < 10 ? '0' : '7';
+		output[i + 2] += input[i] < 10 ? '0' : '7';
+	}
+}

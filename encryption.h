@@ -19,6 +19,8 @@ void krys3des_encryption (const std::string & source, const char* key24bytes, st
 void krys3des_decryption (const std::string & input, const char* key24bytes, std::string & output);
 
 
+void percent_code (const char* input, int len, std::string output);
+
 #ifdef __cplusplus
 extern "C" {
 #endif

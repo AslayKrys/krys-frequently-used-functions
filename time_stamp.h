@@ -44,14 +44,15 @@ public:
 
 	std::string to_string () const
 	{
-		std::string buf('\0', 24);
+		std::string buf;
+		buf.resize (24);
 
 		time_t seconds = this->micro_seconds_since_1970_ / 1000000;
 		int micro_seconds = this->micro_seconds_since_1970_% 1000000;
 		struct tm time_value;
 		gmtime_r (&seconds, &time_value);
 
-		snprintf (const_cast<char*> (buf.c_str()), 24, "%4d%02d%02d %02d:%02d:%02d.%06d", 
+		snprintf (const_cast<char*> (buf.c_str()), 24 + 1, "%4d%02d%02d %02d:%02d:%02d.%06d", 
 				time_value.tm_year + 1900, time_value.tm_mon + 1, time_value.tm_mday, 
 				time_value.tm_hour, time_value.tm_min, time_value.tm_sec, 
 				micro_seconds);
@@ -59,7 +60,6 @@ public:
 		return buf;
 	}
 
-	std::string to_formatted_string () const;
 	bool valid () const;
 
 	friend bool operator< (krys::time_stamp lhs, krys::time_stamp rhs)

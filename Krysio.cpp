@@ -1,11 +1,15 @@
 #define _XOPEN_SOURCE 999999
 #include <fcntl.h>
+#include <wait.h>
+#include <sstream>
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include "Krysio.h"
 #include "Krys.h"
 #include <errno.h>
 #include <string.h>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <stdlib.h>
@@ -304,3 +308,77 @@ int mem_log (int fd, const void* addr, unsigned int len)
 }
 
 
+std::string 
+print_trace (const char* namebuf)
+{
+	/*-------------------------------------------define buffer-----------------------------------------*/
+	char pid_buf[30];
+
+	snprintf (pid_buf, 30, "%d", getpid ());
+	/*----------------------------------------------END------------------------------------------------*/
+
+
+	/*--------------------------------------------init pipe--------------------------------------------*/
+	int fd[2];
+
+	if (pipe (fd) == -1)
+	{
+		return std::string ("");
+	}
+	/*----------------------------------------------END------------------------------------------------*/
+
+
+	/*--------------------------------------spawn child process----------------------------------------*/
+	pid_t child_pid = fork ();
+
+	if (child_pid == 0)
+	{
+		dup2 (fd[1], 1);
+		dup2 (fd[1], 2);
+
+		time_t tm;
+		time (&tm);
+		auto time_struct = localtime (&tm);
+
+		char core_name[60];
+		snprintf (core_name, 60, "core_%04d-%02d-%02d_%02d-%02d-%02d", time_struct->tm_year + 1900, 
+				time_struct->tm_mon + 1, time_struct->tm_mday, time_struct->tm_hour, 
+				time_struct->tm_min, time_struct->tm_sec);
+
+		//execlp ("gdb", "gdb", "--batch", "-n", "-ex", "set pagination 0", "-ex", "thread apply all bt", "-ex", core_name,  "-p", pid_buf, nullptr);
+		execlp ("gcore", "gcore", "-o", core_name, pid_buf, nullptr);
+		//execlp ("/root/test/gcore.sh", "gcore.sh", pid_buf, nullptr);
+		abort ();
+	}
+	/*----------------------------------------------END------------------------------------------------*/
+
+
+	/*---------------------close the write fd for the pipe and read the outcome------------------------*/
+	close (fd[1]);
+
+	waitpid (child_pid, nullptr, 0);
+
+	std::string result;
+
+	char buffer[1024 + 1];
+	
+	int len;
+
+	while (1)				/* reading */
+	{
+		len = read (fd[0], buffer, 1024);
+
+		if (len == 0)
+		{
+			break;
+		}
+
+		buffer[len] = '\0';
+
+		result += buffer;
+	}
+	/*----------------------------------------------END------------------------------------------------*/
+
+
+	return result;
+}

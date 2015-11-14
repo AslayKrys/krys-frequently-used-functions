@@ -20,6 +20,15 @@ must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
 */
+#ifdef __clang__
+
+#define nobreak [[clang::fallthrough]]
+
+#else
+
+#define nobreak do{}while(0)
+
+#endif
 
 #ifndef TINYXML2_INCLUDED
 #define TINYXML2_INCLUDED

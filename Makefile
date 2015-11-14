@@ -9,8 +9,22 @@ LIBRARIES = 	-lpthread -lxml2			# linking libraries
 DEFINES = 		
 HEADERDIR = 	-I /usr/include/libxml2  #-I=../headers
 DBGFLAG = 		-g3
-WARNLVL = 		-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -Werror=parentheses -Werror=uninitialized \
-				-Werror=write-strings -Werror=pointer-arith
+WARNLVL = 		-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable \
+				-Werror=parentheses \
+				-Werror=uninitialized \
+				-Werror=write-strings \
+				-Werror=pointer-arith \
+				-Werror=format \
+				-Werror=format-y2k \
+				-Werror=address \
+				-Werror=implicit-fallthrough \
+				-Werror=array-bounds \
+				-Werror=float-equal \
+				-Werror=shadow \
+				-Werror=cast-qual \
+				-Werror=unreachable-code
+
+
 OPTIMIZATION =  -O0
 CXXFLAGS = $(HEADERDIR) $(DBGFLAG) $(WARNLVL) $(CXXSTD)  $(DEFINES) $(OPTIMIZATION) -fPIC
 CFLAGS =   $(HEADERDIR) $(DBGFLAG) $(WARNLVL) $(CSTD)    $(DEFINES) $(OPTIMIZATION) -fPIC

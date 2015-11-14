@@ -611,18 +611,18 @@ tcp_accept (int socket_)
 char* 
 socket_ip (int socket_)
 {
-	struct sockaddr_in peeraddr;
+	struct sockaddr_in peeraddr__;
 
-	socklen_t peerlen = sizeof (peeraddr);
+	socklen_t peerlen__ = sizeof (peeraddr__);
 
 
-	if (getpeername (socket_, (__SOCKADDR_ARG)&peeraddr, &peerlen) == -1)
+	if (getpeername (socket_, (__SOCKADDR_ARG)&peeraddr__, &peerlen__) == -1)
 	{
 		perror ("error at getpeername.");
 		return NULL;
 	}
 
-	return inet_ntoa (peeraddr.sin_addr);
+	return inet_ntoa (peeraddr__.sin_addr);
 }
 
 
@@ -635,19 +635,19 @@ socket_ip (int socket_)
 unsigned short 
 socket_port (int socket_)
 {
-	struct sockaddr_in peeraddr;
+	struct sockaddr_in peeraddr__;
 
-	socklen_t peerlen = sizeof (peeraddr);
+	socklen_t peerlen__ = sizeof (peeraddr__);
 
 	
 
-	if (getpeername (socket_, (__SOCKADDR_ARG)&peeraddr, &peerlen) == -1)
+	if (getpeername (socket_, (__SOCKADDR_ARG)&peeraddr__, &peerlen__) == -1)
 	{
 		perror ("error at getpeername.");
 		return 0;
 	}
 
-	return ntohs (peeraddr.sin_port);
+	return ntohs (peeraddr__.sin_port);
 }
 
 
@@ -702,7 +702,7 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 	memcpy (write_buffer + sizeof len, buf, len);
 
-	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) not_eq len + sizeof htons_len)
+	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) not_eq (int)(len + sizeof htons_len))
 	{
 		return -1;
 	}
@@ -747,7 +747,7 @@ bool string_send (int socket_, const std::string& str)
 {
 	int32_t htonl_len = htonl ((long)str.length());
 
-	return socket < 0 or str.length() == 0 ? 
+	return socket_ < 0 or str.length() == 0 ? 
 		false: tcp_write (socket_, &htonl_len, sizeof htonl_len) != sizeof htonl_len ?
 		false: tcp_write (socket_, str.c_str(), str.length()) != (int)str.length() ? 
 		false: true;
@@ -889,4 +889,15 @@ int fd_obtain (int fd, const char* socket_file)
 
 	return recv_fd (unix_domain_socket);
 	/*----------------------------------------------END------------------------------------------------*/
+}
+
+
+int unlimit_fd (int max)
+{
+	struct rlimit rl;
+
+	rl.rlim_cur = max;
+	rl.rlim_max = max;
+
+	return setrlimit (RLIMIT_NOFILE, &rl);
 }

@@ -280,15 +280,12 @@ extern char* log_dir;
 
 /*--------------------------------logging with position info added---------------------------------*/
 //#if defined POS_ON
-//#define POSITION(m,...) \
-//	LOG("%s,%s,%d,pid:%ld," m , __FILE__,__func__,__LINE__,(long int)getpid(),##__VA_ARGS__)
+#define POSITION(m,...) \
+	LOG("%s,%s,%d,pid:%ld," m , __FILE__,__func__,__LINE__,(long int)getpid(),##__VA_ARGS__)
 //#else
 //#define POSITION LOG
 //#endif
 
-#define POSITION(FILE_DESCRIPTOR,m,...) \
-	RAWLOG(FILE_DESCRIPTOR, "%s,%s,%d,pid:%ld," m , __FILE__,__func__,__LINE__,(long int)getpid(),##__VA_ARGS__)
-#else
 /*----------------------------------------------END------------------------------------------------*/
 
 

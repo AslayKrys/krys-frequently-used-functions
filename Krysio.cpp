@@ -308,8 +308,8 @@ int mem_log (int fd, const void* addr, unsigned int len)
 }
 
 
-std::string 
-print_trace (const char* namebuf)
+int
+print_trace (const char* corepath)
 {
 	/*-------------------------------------------define buffer-----------------------------------------*/
 	char pid_buf[30];
@@ -323,7 +323,7 @@ print_trace (const char* namebuf)
 
 	if (pipe (fd) == -1)
 	{
-		return std::string ("");
+		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
@@ -345,8 +345,11 @@ print_trace (const char* namebuf)
 				time_struct->tm_mon + 1, time_struct->tm_mday, time_struct->tm_hour, 
 				time_struct->tm_min, time_struct->tm_sec);
 
-		//execlp ("gdb", "gdb", "--batch", "-n", "-ex", "set pagination 0", "-ex", "thread apply all bt", "-ex", core_name,  "-p", pid_buf, nullptr);
-		execlp ("gcore", "gcore", "-o", core_name, pid_buf, nullptr);
+		std::string str_core_file = corepath == nullptr ? "." : corepath;
+		
+		str_core_file += (str_core_file[str_core_file.length() - 1] != '/' ? (std::string ("/") + core_name) : core_name);
+
+		execlp ("gcore", "gcore", "-o", corepath, pid_buf, nullptr);
 		//execlp ("/root/test/gcore.sh", "gcore.sh", pid_buf, nullptr);
 		abort ();
 	}
@@ -356,29 +359,17 @@ print_trace (const char* namebuf)
 	/*---------------------close the write fd for the pipe and read the outcome------------------------*/
 	close (fd[1]);
 
-	waitpid (child_pid, nullptr, 0);
+	int status;
 
-	std::string result;
+	waitpid (child_pid, &status, 0);
 
-	char buffer[1024 + 1];
-	
-	int len;
-
-	while (1)				/* reading */
+	if (WEXITSTATUS (status) != 0)
 	{
-		len = read (fd[0], buffer, 1024);
-
-		if (len == 0)
-		{
-			break;
-		}
-
-		buffer[len] = '\0';
-
-		result += buffer;
+		return -1;
 	}
+
 	/*----------------------------------------------END------------------------------------------------*/
 
 
-	return result;
+	return 0;
 }

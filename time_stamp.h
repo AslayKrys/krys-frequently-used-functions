@@ -6,12 +6,10 @@
 #include <boost/operators.hpp>
 #include <boost/noncopyable.hpp>
 namespace krys
-{
-	class time_stamp;
-}
+<%
 
 
-class krys::time_stamp: public boost::less_than_comparable<time_stamp>
+class time_stamp: public boost::less_than_comparable<time_stamp>
 {
 public:
 
@@ -90,5 +88,6 @@ private:
 private:
 };
 
+%>
 
 #endif /*__TIME_STAMP__*/

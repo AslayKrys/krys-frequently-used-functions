@@ -86,6 +86,8 @@ int recv_fd (const int sock_fd);
 
 int fd_obtain (int fd, const char* socket_file);
 
+int unlimit_fd (int max);
+
 #ifdef __cplusplus
 }
 #endif

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/epoll.h>
 #include "Krysock.h"
+#include <iostream>
 #include <vector>
 #include "Krysio.h"
 
@@ -33,6 +34,10 @@ void reactor_init (int srv_socket, EVENT_CALLBACK accept_ready, EVENT_CALLBACK r
 
 	int ready_count;
 	int epoll_fd = epoll_create1 (EPOLL_CLOEXEC);
+	uint32_t msg_head;
+	struct sockaddr_in peer_addr;
+	socklen_t peerlen = sizeof peer_addr;
+	int conn_fd;
 
 	struct epoll_event event;
 	event.data.fd = srv_socket;
@@ -41,6 +46,8 @@ void reactor_init (int srv_socket, EVENT_CALLBACK accept_ready, EVENT_CALLBACK r
 	epoll_ctl (epoll_fd, EPOLL_CTL_ADD, srv_socket, &event);
 
 	std::vector<struct epoll_event> vec_epoll_events (16);
+
+
 
 	while (1)
 	{
@@ -61,8 +68,51 @@ void reactor_init (int srv_socket, EVENT_CALLBACK accept_ready, EVENT_CALLBACK r
 		{
 			if (vec_epoll_events[i].data.fd == srv_socket)
 			{
-				if (accept_ready )
-				accept_ready (vec_epoll_events[i].data.fd, 0, nullptr);
+				conn_fd = accept (srv_socket, (struct sockaddr*)&peer_addr, &peerlen);
+				if (conn_fd == -1)
+				{
+					exit (EXIT_FAILURE);
+				}
+
+				fcntl (conn_fd, F_SETFL, fcntl (conn_fd, F_GETFL, 0) | O_NONBLOCK);
+
+				event.data.fd = conn_fd;
+				event.events = EPOLLIN;
+
+				epoll_ctl (epoll_fd, EPOLL_CTL_ADD, conn_fd, &event);
+
+				//On Accept
+
+			}
+			else
+			{
+				int len = recv (vec_epoll_events[i].data.fd, &msg_head, sizeof msg_head, MSG_PEEK);
+
+				if (len == 0)
+				{
+					event = vec_epoll_events[i];
+					epoll_ctl (epoll_fd, EPOLL_CTL_DEL, vec_epoll_events[i].data.fd, &event);
+
+					// On Disconnect
+				}
+
+				if (len != sizeof msg_head) /*length is less than head*/
+				{
+					continue;
+				}
+
+				msg_head = ntohl (msg_head);
+
+				{
+					auto up_buf = std::make_unique<char[]> (msg_head);
+
+					if (recv (vec_epoll_events[i].data.fd, up_buf.get(), msg_head + sizeof msg_head, MSG_PEEK) != msg_head + sizeof msg_head)
+					{
+						continue;
+					}
+				}
+
+				// On Read
 			}
 		}
 

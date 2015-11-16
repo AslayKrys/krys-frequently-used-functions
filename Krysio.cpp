@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE 999999
 #include <fcntl.h>
 #include <wait.h>
+#include <iostream>
 #include <sstream>
 #include <unistd.h>
 #include <stdio.h>
@@ -29,7 +30,7 @@
 int 
 redir (int closefile, const char* filepath)
 {
-	if (NULL == filepath)
+	if (nullptr == filepath)
 	{
 		errno = EINVAL;
 		return -2;

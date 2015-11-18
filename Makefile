@@ -22,7 +22,8 @@ WARNLVL = 		-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable \
 				-Werror=float-equal \
 				-Werror=shadow \
 				-Werror=cast-qual \
-				-Werror=unreachable-code
+				-Werror=unreachable-code \
+				-Werror=return-stack-address
 
 
 OPTIMIZATION =  -O0

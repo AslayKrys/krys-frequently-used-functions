@@ -650,11 +650,14 @@ socket_port (int socket_)
 	return ntohs (peeraddr__.sin_port);
 }
 
+typedef struct aaa {
+   int n;
+   short s;
+}aaa;
 
 int
 java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 {
-
 	unsigned short len;
 	/*----------------------------------------handling meta data---------------------------------------*/
 
@@ -664,17 +667,12 @@ java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
-
-
-
-
-
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohs (len); /*convert len to network bit sequence*/
 
 	buf = std::make_unique<char[]> (len + 1);
 
-	iferr (tcp_read_timeout (socket_, buf.get(), len, time_out) not_eq (signed int)len)    /*read data*/
+	iferr (tcp_read_timeout (socket_, buf.get(), len, time_out) != (signed int)len)    /*read data*/
 	{
 		return -1;
 	}
@@ -901,3 +899,4 @@ int unlimit_fd (int max)
 
 	return setrlimit (RLIMIT_NOFILE, &rl);
 }
+

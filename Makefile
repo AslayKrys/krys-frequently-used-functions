@@ -5,7 +5,7 @@
 
 CSTD = 			-std=c99
 CXXSTD = 		-std=c++14    				#   C++ standard
-LIBRARIES = 	-lpthread -lxml2			# linking libraries
+LIBRARIES = 	-lpthread -lxml2 -lboost_date_time -lboost_system -lboost_filesystem -lboost_thread -lboost_exception -lstdc++			# linking libraries
 DEFINES = 		
 HEADERDIR = 	-I /usr/include/libxml2  #-I=../headers
 DBGFLAG = 		-g3
@@ -34,7 +34,7 @@ DYNAMIC_LIB = libkrys.so
 CXX = 	clang++
 CC = 	clang
 OBJS = 	$(shell ls *.c *.cpp 2>/dev/null | sed "s/\(.*\.\)\(c\|cpp\)/\1o/")
-LINK = $(shell ls *.cpp &>/dev/null  && echo $(CXX) || echo $(CC))
+LINK = $(CXX)
 
 all:header_check $(BIN)
 
@@ -48,6 +48,8 @@ all:$(DYNAMIC_LIB)
 
 $(DYNAMIC_LIB):$(OBJS)
 	$(LINK) -fPIC -shared $^ -o $@ 
+%:%.o
+	$(LINK) $(LINKFLAGS) $^ -o $@
 
 %.o:%.cpp 
 	$(CXX) $< $(CXXFLAGS)  -c -o $@

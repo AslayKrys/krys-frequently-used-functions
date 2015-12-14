@@ -5,7 +5,7 @@
 
 CSTD = 			-std=c99
 CXXSTD = 		-std=c++14    				#   C++ standard
-LIBRARIES = 	-lpthread -lxml2 -lboost_date_time -lboost_system -lboost_filesystem -lboost_thread -lboost_exception -lstdc++			# linking libraries
+LIBRARIES = 	-lpthread -lxml2 -lboost_date_time -lboost_system -lboost_filesystem -lboost_thread -lboost_exception -lstdc++ -lboost_thread			# linking libraries
 DEFINES = 		
 HEADERDIR = 	-I /usr/include/libxml2  #-I=../headers
 DBGFLAG = 		-g3

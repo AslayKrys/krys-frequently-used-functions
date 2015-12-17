@@ -571,32 +571,6 @@ tcp_listen (const char* host, unsigned short port)
 
 
 
-// Function: tcp_accept
-// INPUT:socket_ file descriptor.
-// RETURN VALUE: On success,the function returns the file descriptor of the connected socked
-// and -1 is returned if any system error occurs.
-
-
-static __thread	struct sockaddr_in peeraddr;
-static __thread socklen_t peerlen = sizeof (peeraddr);
-
-static __thread struct client_info peer;
-
-
-client_info* 
-tcp_accept (int socket_)
-{
-	peer.client_fd = accept (socket_, (struct sockaddr*)&peeraddr, &peerlen);
-
-	if (peer.client_fd != -1)
-	{
-		strcpy (peer.client_address, inet_ntoa (peeraddr.sin_addr));
-		peer.client_port = ntohs (peeraddr.sin_port);
-	}
-
-	return &peer;
-}
-
 
 
 

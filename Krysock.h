@@ -23,22 +23,6 @@
 
 
 
-/*--------------------------------------------type define------------------------------------------*/
-typedef struct client_info
-{
-	int client_fd;
-	char client_address[16];
-	unsigned short client_port;
-}client_info;
-/*----------------------------------------------END------------------------------------------------*/
-
-
-
-
-
-#define TCP_ACCEPT(socket_fd,sockaddr_ptr) \
-	({socklen_t peerlen = sizeof (struct sockaddr_in); accept (socket_fd, (struct sockaddr*)sockaddr_ptr, sockaddr_ptr == NULL ? NULL : &peerlen);})
-
 
 
 #define READ_TIMEOUT 5
@@ -50,8 +34,6 @@ extern "C" {
 int udp_bind (const char* ip, unsigned short port);
 
 int tcp_listen (const char* host, unsigned short port);
-
-client_info* tcp_accept (int socket);
 
 char* socket_ip (int socket_);
 

@@ -650,10 +650,6 @@ socket_port (int socket_)
 	return ntohs (peeraddr__.sin_port);
 }
 
-typedef struct aaa {
-   int n;
-   short s;
-}aaa;
 
 int
 java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)

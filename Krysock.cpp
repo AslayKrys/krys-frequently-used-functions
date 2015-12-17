@@ -444,17 +444,11 @@ tcp_open (const char* host, unsigned short port)
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
-
-
-
 	/*---------------------------------------variable definitions--------------------------------------*/
 	int srvfd = -1;						/*server socket*/
 	u_int32_t uint32_addr = 0;			/*integer IP address*/
 	struct sockaddr_in srvaddr;			/*server address*/
 	/*----------------------------------------------END------------------------------------------------*/
-
-
-
 
 	/*---------------------------------------analysing hostname----------------------------------------*/
 	if (analysis_addr (host, &uint32_addr) == -1)
@@ -462,8 +456,6 @@ tcp_open (const char* host, unsigned short port)
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
-
-
 
 
 	/*------------------------------------------initializing socket------------------------------------*/
@@ -567,14 +559,6 @@ tcp_listen (const char* host, unsigned short port)
 }
 
 
-
-
-
-
-
-
-
-
 // Function: socket_ip
 // INPUT:socket_ file descriptor.
 // RETURN VALUE: ip in C string on success,and NULL on error.
@@ -670,7 +654,7 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 	memcpy (write_buffer + sizeof len, buf, len);
 
-	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) not_eq (int)(len + sizeof htons_len))
+	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) != (int)(len + sizeof htons_len))
 	{
 		return -1;
 	}
@@ -681,10 +665,9 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 
 std::string
-string_receive (int socket_, int timeout)
+string_receive (int socket_, int timeout, unsigned int maxlen)
 {
 	u_int32_t len;
-	std::unique_ptr<char[]> tempstr; 
 
 	/*----------------------------------------handling meta data---------------------------------------*/
 
@@ -697,17 +680,21 @@ string_receive (int socket_, int timeout)
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohl (len); /*convert len to network bit sequence*/
 
+	if (len > maxlen)
+	{
+		return std::string ("");
+	}
 
-	tempstr = std::make_unique<char<::>> (len + 1);
+	std::string str_rcv;
+	str_rcv.resize (len);
 
-	iferr (tcp_read_timeout (socket_, tempstr.get(), len, timeout) != (int)len)    /*read data*/
+	iferr (tcp_read_timeout (socket_, const_cast<char*>(str_rcv.data()), len, timeout) != (int)len)    /*read data*/
 	{
 		return std::string ("");
 	}
 	/*----------------------------------------------END------------------------------------------------*/
-	tempstr<:len:> = '\0';
 
-	return std::string (tempstr.get());
+	return str_rcv;
 }
 
 

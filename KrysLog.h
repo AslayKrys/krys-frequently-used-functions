@@ -99,13 +99,15 @@ public:
 		va_start (ap, format);
 
 		boost::interprocess::file_lock log_file_lock (log_ref.path); //给文件上锁
+		log_file_lock.lock ();
 
 
 		/*-----------------------------------write log and flush buffer------------------------------------*/
 		ret = vfprintf (temp_fp, format, ap);
 		fflush (temp_fp);
-		log_file_lock.unlock();
 		/*----------------------------------------------END------------------------------------------------*/
+
+		log_file_lock.unlock(); //给文件解锁
 
 		va_end (ap);
 

@@ -34,7 +34,7 @@ analysis_addr (const char *_addrstr, u_int32_t *_addr)
 	/*---------------------------------trying for hostname---------------------------------------------*/
     if ((hent = gethostbyname (_addrstr)) != NULL ) 
 	{
-        *_addr = ((struct in_addr *)(hent->h_addr_list <:0:>))->s_addr;
+        *_addr = ((struct in_addr *)(hent->h_addr_list [0]))->s_addr;
         return 0;
     }
 	/*----------------------------------------------END------------------------------------------------*/

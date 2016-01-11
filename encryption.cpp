@@ -11,7 +11,6 @@
 
 int krys3des_raw_encryption (const void* src, int input_length, void* key24bytes, void* out_buffer)
 {
-	
 	if (src == nullptr or input_length <= 0 or key24bytes == nullptr or out_buffer == nullptr)
 	{
 		errno = EINVAL;

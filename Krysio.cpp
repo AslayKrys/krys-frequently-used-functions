@@ -30,12 +30,6 @@
 int 
 redir (int closefile, const char* filepath)
 {
-	if (nullptr == filepath)
-	{
-		errno = EINVAL;
-		return -2;
-	}
-
 	int fd = open (filepath, closefile == 0? (O_RDONLY): (O_WRONLY | O_CREAT | __APPEND), 0666);
 
 	if (fd == -1)
@@ -82,7 +76,6 @@ set_fl (int fd, int flags)
 
 
 //same pattern as set_fl
-
 
 int
 clr_fl (int fd, int flags)

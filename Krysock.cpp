@@ -19,6 +19,7 @@ return value:
 	properly set
 ************************************************************/
 
+
 int
 analysis_addr (const char *_addrstr, u_int32_t *_addr)
 {
@@ -30,11 +31,14 @@ analysis_addr (const char *_addrstr, u_int32_t *_addr)
         return 0;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
+
+
+	
   
 	/*---------------------------------trying for hostname---------------------------------------------*/
     if ((hent = gethostbyname (_addrstr)) != NULL ) 
 	{
-        *_addr = ((struct in_addr *)(hent->h_addr_list [0]))->s_addr;
+        *_addr = ((struct in_addr *)(hent->h_addr_list <:0:>))->s_addr;
         return 0;
     }
 	/*----------------------------------------------END------------------------------------------------*/
@@ -46,6 +50,15 @@ analysis_addr (const char *_addrstr, u_int32_t *_addr)
 	/*----------------------------------------------END------------------------------------------------*/
 }
 
+/************************************************************
+---------------------------By Krys---------------------------
+input:
+	ip in string format and port in unsigned short
+description:
+	this fucntion binds a udp socket to a port
+return value:
+	returns the socket on success , on failure, returns -1
+************************************************************/
 
 int 
 udp_bind (const char* ip, unsigned short port)
@@ -444,11 +457,17 @@ tcp_open (const char* host, unsigned short port)
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
+
+
+
 	/*---------------------------------------variable definitions--------------------------------------*/
 	int srvfd = -1;						/*server socket*/
 	u_int32_t uint32_addr = 0;			/*integer IP address*/
 	struct sockaddr_in srvaddr;			/*server address*/
 	/*----------------------------------------------END------------------------------------------------*/
+
+
+
 
 	/*---------------------------------------analysing hostname----------------------------------------*/
 	if (analysis_addr (host, &uint32_addr) == -1)
@@ -456,6 +475,8 @@ tcp_open (const char* host, unsigned short port)
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
+
+
 
 
 	/*------------------------------------------initializing socket------------------------------------*/
@@ -559,6 +580,40 @@ tcp_listen (const char* host, unsigned short port)
 }
 
 
+
+
+
+
+// Function: tcp_accept
+// INPUT:socket_ file descriptor.
+// RETURN VALUE: On success,the function returns the file descriptor of the connected socked
+// and -1 is returned if any system error occurs.
+
+
+static __thread	struct sockaddr_in peeraddr;
+static __thread socklen_t peerlen = sizeof (peeraddr);
+
+static __thread struct client_info peer;
+
+
+client_info* 
+tcp_accept (int socket_)
+{
+	peer.client_fd = accept (socket_, (struct sockaddr*)&peeraddr, &peerlen);
+
+	if (peer.client_fd != -1)
+	{
+		strcpy (peer.client_address, inet_ntoa (peeraddr.sin_addr));
+		peer.client_port = ntohs (peeraddr.sin_port);
+	}
+
+	return &peer;
+}
+
+
+
+
+
 // Function: socket_ip
 // INPUT:socket_ file descriptor.
 // RETURN VALUE: ip in C string on success,and NULL on error.
@@ -612,6 +667,7 @@ socket_port (int socket_)
 int
 java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 {
+
 	unsigned short len;
 	/*----------------------------------------handling meta data---------------------------------------*/
 
@@ -621,12 +677,17 @@ java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
+
+
+
+
+
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohs (len); /*convert len to network bit sequence*/
 
 	buf = std::make_unique<char[]> (len + 1);
 
-	iferr (tcp_read_timeout (socket_, buf.get(), len, time_out) != (signed int)len)    /*read data*/
+	iferr (tcp_read_timeout (socket_, buf.get(), len, time_out) not_eq (signed int)len)    /*read data*/
 	{
 		return -1;
 	}
@@ -654,7 +715,7 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 	memcpy (write_buffer + sizeof len, buf, len);
 
-	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) != (int)(len + sizeof htons_len))
+	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) not_eq (int)(len + sizeof htons_len))
 	{
 		return -1;
 	}
@@ -665,13 +726,14 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 
 std::string
-string_receive (int socket_, int timeout, unsigned int maxlen)
+string_receive (int socket_, int timeout)
 {
 	u_int32_t len;
+	std::string str_recv;
 
 	/*----------------------------------------handling meta data---------------------------------------*/
 
-	iferr (tcp_read_timeout (socket_, &len, sizeof len, timeout) not_eq sizeof len)
+	if (tcp_read_timeout (socket_, &len, sizeof len, timeout) not_eq sizeof len) 
 	{
 		return std::string ("");
 	}
@@ -680,21 +742,16 @@ string_receive (int socket_, int timeout, unsigned int maxlen)
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohl (len); /*convert len to network bit sequence*/
 
-	if (len > maxlen)
-	{
-		return std::string ("");
-	}
 
-	std::string str_rcv;
-	str_rcv.resize (len);
+	str_recv.resize (len);
 
-	iferr (tcp_read_timeout (socket_, const_cast<char*>(str_rcv.data()), len, timeout) != (int)len)    /*read data*/
+	if (tcp_read_timeout (socket_, const_cast<char*>(str_recv.data()), len, timeout) != (int)len)    
 	{
 		return std::string ("");
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
-	return str_rcv;
+	return str_recv;
 }
 
 
@@ -856,4 +913,3 @@ int unlimit_fd (int max)
 
 	return setrlimit (RLIMIT_NOFILE, &rl);
 }
-

@@ -251,54 +251,6 @@ extern char* log_dir;
 #endif
 /*----------------------------------------------END------------------------------------------------*/
 
-
-
-
-
-
-
-
-/*----------------------------------------basic logging macro--------------------------------------*/
-#define RAWLOG(FILE_DESCRIPTOR,m,...) ({\
-	time_t time_in_sec = time(NULL);\
-	struct tm* now = localtime(&time_in_sec);\
-	flock(FILE_DESCRIPTOR,LOCK_EX);\
-	dprintf(FILE_DESCRIPTOR, "[%02d:%02d:%02d]" m "\n", now->tm_hour, now->tm_min, now->tm_sec,##__VA_ARGS__);\
-	flock(FILE_DESCRIPTOR,LOCK_UN);})
-
-#define LOG(m,...) ({\
-	time_t time_in_sec = time(NULL);\
-	struct tm* now = localtime(&time_in_sec);\
-	if (now->tm_mday != current_day)\
-		another_day ();\
-	flock(log_fd,LOCK_EX);\
-	fprintf (log_file, "[%02d:%02d:%02d]" m "\n", now->tm_hour, now->tm_min, now->tm_sec,##__VA_ARGS__);\
-	fflush (log_file);\
-	flock(log_fd,LOCK_UN);})
-/*----------------------------------------------END------------------------------------------------*/
-
-
-/*--------------------------------logging with position info added---------------------------------*/
-//#if defined POS_ON
-#define POSITION(m,...) \
-	LOG("%s,%s,%d,pid:%ld," m , __FILE__,__func__,__LINE__,(long int)getpid(),##__VA_ARGS__)
-//#else
-//#define POSITION LOG
-//#endif
-
-/*----------------------------------------------END------------------------------------------------*/
-
-
-
-/*---------------------------------------different type of logs------------------------------------*/
-
-
-/*----------------------------------------------END------------------------------------------------*/
-
-
-
-
-
 #endif /*KRYS_H*/
 
 

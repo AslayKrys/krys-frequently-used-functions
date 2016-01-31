@@ -278,3 +278,13 @@ struct __KILL__
 private:
 		int sig = 0;
 };
+
+
+#define quit __QUIT__{},
+struct __QUIT__
+{
+	inline void operator, (int exit_code)
+	{
+		exit (exit_code);
+	}
+};

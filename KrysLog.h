@@ -27,37 +27,6 @@ return value:
 
 //递归目录创建, 基于boost
 
-inline int boost_mkdir (const boost::filesystem::path& dir)
-{
-	try //如果丢出异常就返回-1并且设置error
-	{
-		if (!boost::filesystem::exists (dir.parent_path())) //如果父目录不存在则调用自身递归创建
-		{
-			if (-1 == boost_mkdir (dir.parent_path())) 
-			{
-				return -1;
-			}
-		}
-
-		if (!boost::filesystem::exists (dir)) //确保父目录存在的情况下, 如果自身不存在则创建之
-		{
-			boost::filesystem::create_directory (dir);
-		}
-		else //如果文件已经存在返回1
-		{
-			return 1;
-		}
-
-	}
-	catch (boost::filesystem::filesystem_error err)
-	{
-		//boost的system_err::code设置的值和标准C中的errno是兼容的
-		errno = err.system_error::code ().value();
-		return -1;
-	}
-
-	return 0; //如果文件不存在并且创建成功, 返回0
-}
 
 template<bool header_only = true>
 class __LOG_DATA__
@@ -134,7 +103,7 @@ public:
 
 		log_path_to_file /= type; //在日志总目录下创建跟日志类型同名的文件夹
 
-		if (boost_mkdir (log_path_to_file) == -1) //创建该文件夹
+		if (boost::filesystem::create_directories (log_path_to_file) == -1) //创建该文件夹
 		{
 			auto up_buffer = std::make_unique<char[]> (128);
 			snprintf (up_buffer.get(), 128, "gcore %s -o %d", current_path().string<std::string>().c_str(), getpid());

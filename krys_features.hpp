@@ -270,9 +270,9 @@ struct __KILL__
 	{
 		return kill (pid, sig);
 	}
-	__KILL__ operator - (int sig)
+	__KILL__ operator - (int _sig)
 	{
-		this->sig = sig;
+		this->sig = _sig;
 		return (*this);
 	}
 private:

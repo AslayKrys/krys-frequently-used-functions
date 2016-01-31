@@ -20,6 +20,7 @@
 #include <netdb.h>
 #include <string>
 #include <sys/un.h>
+#include <memory>
 
 
 
@@ -73,7 +74,7 @@ int read_timeout (int socket, unsigned int sec);
 
 int analysis_addr (const char *_addrstr, u_int32_t *_addr);
 
-int krys_read (int socket_, void** buf);
+int krys_read (int socket_, std::unique_ptr<unsigned char[]>& buf);
 
 int krys_write (int socket_, const void* buf, int len);
 

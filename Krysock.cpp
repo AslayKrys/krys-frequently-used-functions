@@ -344,11 +344,11 @@ tcp_read_timeout (int socket_, void* buf, int len, int second)
 
 
 int
-krys_read (int socket_, void** buf)
+krys_read (int socket_, std::unique_ptr<unsigned char[]>& buf)
 {
 
 	/*----------------------------------if buf is null, return error-----------------------------------*/
-	if (buf == NULL)
+	if (buf == nullptr)
 	{
 		errno = EINVAL;
 		return -1;
@@ -362,7 +362,7 @@ krys_read (int socket_, void** buf)
 
 	iferr (tcp_read_timeout (socket_, &len, sizeof len, 10) != sizeof len)
 	{
-		*buf = NULL;
+		buf.reset (nullptr);
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
@@ -373,12 +373,11 @@ krys_read (int socket_, void** buf)
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohl (len); /*convert len to network bit sequence*/
 
-	//*buf = (__typeof__ (*buf))ALLOC_MEM (len); /*alloc memory with given size*/
-	*buf = malloc (len); /*alloc memory with given size*/
+	//*buf = malloc (len); 
+	buf = std::make_unique<unsigned char[]> (len); /*alloc memory with given size*/
 
-	iferr (tcp_read_timeout (socket_, *buf, len, 10) != len)    /*read data*/
+	iferr (tcp_read_timeout (socket_, buf.get(), len, 10) != len)    /*read data*/
 	{
-		FREE (*buf);
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/

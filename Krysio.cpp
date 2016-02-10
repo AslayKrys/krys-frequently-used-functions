@@ -27,28 +27,6 @@
 
 
 
-int 
-redir (int closefile, const char* filepath)
-{
-	int fd = open (filepath, closefile == 0? (O_RDONLY): (O_WRONLY | O_CREAT | __APPEND), 0666);
-
-	if (fd == -1)
-	{
-		return -1;
-	}
-
-	if (closefile > 2 or closefile < 0)
-	{
-		errno = EINVAL;
-		return -1;
-	}
-
-	if (dup2 (fd, closefile) == -1)
-	{
-		return -1;
-	}
-	return 0;
-}
 
 //set fd flags
 //fd:file descriptor on which the flag needs to be set
@@ -341,7 +319,6 @@ print_trace (const char* corepath)
 		str_core_file += (str_core_file[str_core_file.length() - 1] != '/' ? (std::string ("/") + core_name) : core_name);
 
 		execlp ("gcore", "gcore", "-o", corepath, pid_buf, nullptr);
-		//execlp ("/root/test/gcore.sh", "gcore.sh", pid_buf, nullptr);
 		abort ();
 	}
 	/*----------------------------------------------END------------------------------------------------*/

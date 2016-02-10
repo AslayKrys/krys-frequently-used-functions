@@ -186,7 +186,7 @@ tcp_readline (int socket_, void* buf, int max_len)
 		/*----------------------------------------peek buffer----------------------------------------------*/
 		readval = recv_peek (socket_, tmp_ptr, max_len - offset);
 
-		iferr (readval <= 0)
+		if (readval <= 0)
 		{
 			return readval;
 		}
@@ -258,9 +258,9 @@ tcp_read (int socket_, void* buf, int len)
 	while (len > offset) /*read loop*/
 	{
 		/*-------------------------------execution of the system API for reading---------------------------*/
-		iferr ((readval = read (socket_, tmp_ptr + offset, len - offset)) <= 0)
+		if ((readval = read (socket_, tmp_ptr + offset, len - offset)) <= 0)
 		{
-			iferr (readval == -1 and errno == EINTR)
+			if (readval == -1 and errno == EINTR)
 			{
 				continue;
 			}
@@ -325,9 +325,9 @@ tcp_read_timeout (int socket_, void* buf, int len, int second)
 
 
 		/*----------------execution of the system API for reading after a timeout examing------------------*/
-		iferr ((readval = read (socket_, tmp_ptr + offset, len - offset)) <= 0)
+		if ((readval = read (socket_, tmp_ptr + offset, len - offset)) <= 0)
 		{
-			iferr (readval == -1 and errno == EINTR)
+			if (readval == -1 and errno == EINTR)
 			{
 				continue;
 			}
@@ -360,7 +360,7 @@ krys_read (int socket_, std::unique_ptr<unsigned char[]>& buf)
 	/*----------------------------------------handling meta data---------------------------------------*/
 	int len;
 
-	iferr (tcp_read_timeout (socket_, &len, sizeof len, 10) != sizeof len)
+	if (tcp_read_timeout (socket_, &len, sizeof len, 10) != sizeof len)
 	{
 		buf.reset (nullptr);
 		return -1;
@@ -376,7 +376,7 @@ krys_read (int socket_, std::unique_ptr<unsigned char[]>& buf)
 	//*buf = malloc (len); 
 	buf = std::make_unique<unsigned char[]> (len); /*alloc memory with given size*/
 
-	iferr (tcp_read_timeout (socket_, buf.get(), len, 10) != len)    /*read data*/
+	if (tcp_read_timeout (socket_, buf.get(), len, 10) != len)    /*read data*/
 	{
 		return -1;
 	}
@@ -390,7 +390,7 @@ int
 krys_write (int socket_, const void* buf, int len)
 {
 	/*-------------------------------------validating parameters---------------------------------------*/
-	iferr (len <= 0 or buf == NULL)
+	if (len <= 0 or buf == NULL)
 	{
 		errno = EINVAL;
 		return -1;
@@ -400,14 +400,14 @@ krys_write (int socket_, const void* buf, int len)
 	int htonl_len = htonl (len);	/*convert length to net byte sequence*/
 
 	/*--------------------------------------write message header---------------------------------------*/
-	iferr (tcp_write (socket_, &htonl_len, sizeof len) != sizeof htonl_len)
+	if (tcp_write (socket_, &htonl_len, sizeof len) != sizeof htonl_len)
 	{
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
 	/*---------------------------------------write message body----------------------------------------*/
-	iferr (tcp_write (socket_, buf, len) != len)
+	if (tcp_write (socket_, buf, len) != len)
 	{
 		return -1;
 	}
@@ -426,7 +426,7 @@ tcp_write (int socket_, const void* buf, int len)
 
 	while (len > offset)
 	{
-		iferr ((write_val = write (socket_, (char*)buf + offset, len - offset)) == -1)
+		if ((write_val = write (socket_, (char*)buf + offset, len - offset)) == -1)
 		{
 			if (errno != EINTR) break;
 
@@ -670,7 +670,7 @@ java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 	unsigned short len;
 	/*----------------------------------------handling meta data---------------------------------------*/
 
-	iferr (tcp_read_timeout (socket_, &len, sizeof len, time_out) not_eq sizeof len)
+	if (tcp_read_timeout (socket_, &len, sizeof len, time_out) not_eq sizeof len)
 	{
 		return -1;
 	}
@@ -686,7 +686,7 @@ java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 
 	buf = std::make_unique<char[]> (len + 1);
 
-	iferr (tcp_read_timeout (socket_, buf.get(), len, time_out) not_eq (signed int)len)    /*read data*/
+	if (tcp_read_timeout (socket_, buf.get(), len, time_out) not_eq (signed int)len)    /*read data*/
 	{
 		return -1;
 	}
@@ -704,7 +704,7 @@ java_write (int socket_, const void* buf, unsigned short len)
 	static __thread char write_buffer [65538];
 
 	unsigned short htons_len = htons (len);
-	iferr (len <= 0 or buf == NULL)
+	if (len <= 0 or buf == NULL)
 	{
 		errno = EINVAL;
 		return -1;
@@ -714,7 +714,7 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 	memcpy (write_buffer + sizeof len, buf, len);
 
-	iferr (tcp_write (socket_, write_buffer, len + sizeof htons_len) not_eq (int)(len + sizeof htons_len))
+	if (tcp_write (socket_, write_buffer, len + sizeof htons_len) not_eq (int)(len + sizeof htons_len))
 	{
 		return -1;
 	}
@@ -902,6 +902,16 @@ int fd_obtain (int fd, const char* socket_file)
 	/*----------------------------------------------END------------------------------------------------*/
 }
 
+//long long file_upload (int sock, const char* path)
+//{
+//	FILE* fp = fopen (path, "r");
+//	if (fp == nullptr) 
+//	{
+//		errno = ENOENT;
+//		return 0;
+//	}
+//	return 0;
+//}
 
 int unlimit_fd (int max)
 {

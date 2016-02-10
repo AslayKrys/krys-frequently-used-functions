@@ -1,5 +1,4 @@
 #include "KrysHttp.h"
-#include <iostream>
 using namespace std;
 
 #define HTTP_VERSION "1.1"
@@ -26,9 +25,6 @@ string http_post(string host, string path, string text, const map<string, string
 		+ str_extra_params + 
 		"\r\n" + 
 		text;
-
-	cout << str_send << endl;
-
 
 	if ((server_socket = tcp_open (host.c_str(), port)) == -1)
 	{

@@ -210,8 +210,7 @@ int mem_log (int fd, const void* addr, unsigned int len)
 
 	char* end = (char*)addr + len;
 	char* pos = (char*)addr;
-	DEFINE_PTR (char, charbuf);
-	ALLOC_PTR (charbuf, LOG_WIDTH);
+	auto charbuf = std::make_unique<char[]> (LOG_WIDTH);
 
 
 	//header
@@ -238,9 +237,9 @@ int mem_log (int fd, const void* addr, unsigned int len)
 		
 		PRINTSPACES (fd);
 
-		memcpy (charbuf, pos, LOG_WIDTH);
+		memcpy (charbuf.get(), pos, LOG_WIDTH);
 
-		for (char* iter = charbuf; iter != charbuf + LOG_WIDTH; iter++)
+		for (char* iter = charbuf.get(); iter != charbuf.get() + LOG_WIDTH; iter++)
 		{
 			if (*iter == '\n' or *iter == '\t')
 			{
@@ -249,8 +248,8 @@ int mem_log (int fd, const void* addr, unsigned int len)
 		}
 
 		dprintf (fd, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", 
-		*charbuf, *(charbuf + 1), *(charbuf + 2), *(charbuf + 3), *(charbuf + 4), *(charbuf + 5), *(charbuf + 6), *(charbuf + 7), *(charbuf + 8),
-		*(charbuf + 9), *(charbuf + 10), *(charbuf + 11), *(charbuf + 12), *(charbuf + 13), *(charbuf + 14), *(charbuf + 15));
+		charbuf[0], charbuf[1], charbuf[2], charbuf[3], charbuf[4], charbuf[5], charbuf[6], charbuf[7], charbuf[8],
+		charbuf[9], charbuf[10], charbuf[11], charbuf[12], charbuf[13], charbuf[14], charbuf[15]);
 
 		ENDLINESPACES (fd);
 
@@ -295,9 +294,7 @@ int mem_log (int fd, const void* addr, unsigned int len)
 
 	//PRINTSPACES (fd);
 	dprintf (fd, "End of message." "\n-----------------------------------------------------------------------------\n");
-	
 
-	FREE (charbuf);
 	return 0;
 }
 

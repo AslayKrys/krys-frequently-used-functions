@@ -64,7 +64,7 @@ public:
 		boost::interprocess::file_lock l (p.c_str());
 		l.lock();
 
-		fmt::print (fp, format, forward<ARGS>(args)...);
+		fmt::print (fp, format, std::forward<ARGS>(args)...);
 
 		l.unlock();
 		fclose (fp);

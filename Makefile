@@ -31,8 +31,8 @@ CXXFLAGS = $(HEADERDIR) $(DBGFLAG) $(WARNLVL) $(CXXSTD)  $(DEFINES) $(OPTIMIZATI
 CFLAGS =   $(HEADERDIR) $(DBGFLAG) $(WARNLVL) $(CSTD)    $(DEFINES) $(OPTIMIZATION) -fPIC
 LINKFLAGS = $(LIBRARIES)  
 DYNAMIC_LIB = libkrys.so
-CXX = 	clang++
-CC = 	clang
+CXX = 	g++
+CC = 	gcc
 OBJS = 	$(shell ls *.c *.cpp 2>/dev/null | sed "s/\(.*\.\)\(c\|cpp\)/\1o/")
 LINK = $(CXX)
 

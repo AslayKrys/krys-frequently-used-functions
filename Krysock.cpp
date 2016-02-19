@@ -32,8 +32,6 @@ analysis_addr (const char *_addrstr, u_int32_t *_addr)
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
-
-	
   
 	/*---------------------------------trying for hostname---------------------------------------------*/
     if ((hent = gethostbyname (_addrstr)) != NULL ) 
@@ -252,10 +250,16 @@ return value:
 int 
 tcp_read (int socket_, void* buf, int len)
 {
+	if (buf == nullptr or socket_ < 0)
+	{
+		errno = EINVAL;
+		return -1;
+	}
+
 	int32_t offset = 0, readval = 0;	/*offset and bytes that has been read*/
 	char* tmp_ptr = (char*)buf;			/*convert buf to char**/
 
-	while (len > offset) /*read loop*/
+	while (offset < len) /*read loop*/
 	{
 		/*-------------------------------execution of the system API for reading---------------------------*/
 		if ((readval = read (socket_, tmp_ptr + offset, len - offset)) <= 0)
@@ -320,9 +324,6 @@ tcp_read_timeout (int socket_, void* buf, int len, int second)
 			break;
 		}
 		/*----------------------------------------------END------------------------------------------------*/
-
-
-
 
 		/*----------------execution of the system API for reading after a timeout examing------------------*/
 		if ((readval = read (socket_, tmp_ptr + offset, len - offset)) <= 0)
@@ -457,15 +458,11 @@ tcp_open (const char* host, unsigned short port)
 	/*----------------------------------------------END------------------------------------------------*/
 
 
-
-
 	/*---------------------------------------variable definitions--------------------------------------*/
 	int srvfd = -1;						/*server socket*/
 	u_int32_t uint32_addr = 0;			/*integer IP address*/
 	struct sockaddr_in srvaddr;			/*server address*/
 	/*----------------------------------------------END------------------------------------------------*/
-
-
 
 
 	/*---------------------------------------analysing hostname----------------------------------------*/
@@ -477,7 +474,6 @@ tcp_open (const char* host, unsigned short port)
 
 
 
-
 	/*------------------------------------------initializing socket------------------------------------*/
 	srvfd = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (srvfd == -1)
@@ -485,7 +481,6 @@ tcp_open (const char* host, unsigned short port)
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
-
 
 
 	/*---------------------------------------setting server address------------------------------------*/
@@ -651,8 +646,6 @@ socket_port (int socket_)
 
 	socklen_t peerlen__ = sizeof (peeraddr__);
 
-	
-
 	if (getpeername (socket_, (__SOCKADDR_ARG)&peeraddr__, &peerlen__) == -1)
 	{
 		perror ("error at getpeername.");
@@ -666,33 +659,53 @@ socket_port (int socket_)
 int
 java_read (int socket_, std::unique_ptr<char[]>& buf, int time_out)
 {
-
-	unsigned short len;
+	uint16_t len;
 	/*----------------------------------------handling meta data---------------------------------------*/
 
-	if (tcp_read_timeout (socket_, &len, sizeof len, time_out) not_eq sizeof len)
+	if (tcp_read_timeout (socket_, &len, sizeof len, time_out) != sizeof len)
 	{
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
-
-
-
-
-
 
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohs (len); /*convert len to network bit sequence*/
 
 	buf = std::make_unique<char[]> (len + 1);
 
-	if (tcp_read_timeout (socket_, buf.get(), len, time_out) not_eq (signed int)len)    /*read data*/
+	if (tcp_read_timeout (socket_, buf.get(), len, time_out) != (signed int)len)    /*read data*/
 	{
 		return -1;
 	}
 	/*----------------------------------------------END------------------------------------------------*/
 
 	buf[len] = '\0';
+
+	return len;
+}
+
+int
+java_read_string (int socket_, std::string & str_buffer, int time_out)
+{
+	uint16_t len;
+	/*----------------------------------------handling meta data---------------------------------------*/
+
+	if (tcp_read_timeout (socket_, &len, sizeof len, time_out) != sizeof len)
+	{
+		return -1;
+	}
+	/*----------------------------------------------END------------------------------------------------*/
+
+	/*-------------------------------------------handling data-----------------------------------------*/
+	len = ntohs (len); /*convert len to network bit sequence*/
+
+	str_buffer.resize (len);
+
+	if (tcp_read_timeout (socket_, const_cast<char*>(str_buffer.data()), len, time_out) != (signed int)len)    /*read data*/
+	{
+		return -1;
+	}
+	/*----------------------------------------------END------------------------------------------------*/
 
 	return len;
 }
@@ -723,6 +736,14 @@ java_write (int socket_, const void* buf, unsigned short len)
 
 }
 
+int
+java_write_string (int socket_, const std::string str_buffer)
+{
+	return java_write (socket_, str_buffer.data(), str_buffer.size());
+}
+
+
+constexpr unsigned int max_len = 10*1024*1024;
 
 std::string
 string_receive (int socket_, int timeout)
@@ -740,6 +761,12 @@ string_receive (int socket_, int timeout)
 
 	/*-------------------------------------------handling data-----------------------------------------*/
 	len = ntohl (len); /*convert len to network bit sequence*/
+
+	if (len > max_len)
+	{
+		errno = EIO;
+		return std::string ("");
+	}
 
 
 	str_recv.resize (len);
@@ -867,8 +894,6 @@ int fd_obtain (int fd, const char* socket_file)
 	/*----------------------------------------------END------------------------------------------------*/
 
 
-
-
 	/*-----------------registering unix domain socket and establish IPC connection---------------------*/
 	unix_domain_socket = socket (PF_UNIX, SOCK_STREAM, 0);				/*socket registration*/
 	if (unix_domain_socket == -1)
@@ -890,9 +915,6 @@ int fd_obtain (int fd, const char* socket_file)
 	}
 	/*-------------------------------------------------------------------------------------------------*/
 
-
-
-
 	/*------------obtain tcp socket via unix domain IPC mechanism--------------------------------------*/
 
 	tcp_write (unix_domain_socket, &fd, sizeof fd);
@@ -902,16 +924,6 @@ int fd_obtain (int fd, const char* socket_file)
 	/*----------------------------------------------END------------------------------------------------*/
 }
 
-//long long file_upload (int sock, const char* path)
-//{
-//	FILE* fp = fopen (path, "r");
-//	if (fp == nullptr) 
-//	{
-//		errno = ENOENT;
-//		return 0;
-//	}
-//	return 0;
-//}
 
 int unlimit_fd (int max)
 {
